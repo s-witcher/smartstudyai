@@ -2,7 +2,7 @@ from ingestion.file_ingestion import ingest_file
 from algorithms.summarizer import generate_summary
 from algorithms.quiz_generator import generate_quiz
 from algorithms.flashcard_creator import generate_flashcards
-from providers import llm_providers
+from providers.llm_providers import DOAIProvider
 # from providers.doai_provider import DOAIProvider as llm_providers
 
 def main():
@@ -12,7 +12,7 @@ def main():
 
     print("\nProcessing file...")
     text = ingest_file(file_path)
-    llm = llm_providers()
+    llm = DOAIProvider()
 
     if task == "summary":
         result = generate_summary(llm, text)
