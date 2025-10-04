@@ -1,24 +1,35 @@
 import os
-from openai import OpenAI
+import requests
 
-class LLMProvider:
+class DOAIProvider:
     """
-    Wrapper class for interacting with the LLM (e.g., GPT model)
+    LLM provider that uses DigitalOcean Inference API.
     """
-
-    def __init_(self, api_key: str = None, model: str = "heylama"):
-        self.api_key = "sk-do-cjFJ2BkCy-m1dhg3LJgDwud_RMQJqD_YpxyvCeW3PRmu_QhMymxtO1e1ms"
+    def __init__(self, api_key=None, model="openai-gpt-oss-120b"):
+        self.api_key = "sk-do-tZCH12QV7kxevaLMGoOBNWxHvP7pdD4Ya_WrtyrqGRiyNsipSJDs9qQive"
         if not self.api_key:
-            raise ValueError("OpenAI API key not found.")
-        self.client = OpenAI(api_key=self.api_key)
+            raise ValueError("Missing DigitalOcean API key.")
         self.model = model
+        self.url = "https://inference.do-ai.run/v1/chat/completions"
 
     def generate(self, prompt: str) -> str:
-        """
-        Sends a prompt to the LLM and returns the response.
-        """
-        response = self.client.responses.create(
-            model=self.model,
-            input=prompt
-        )
-        return response.output_text.strip()
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.api_key}"
+        }
+        data = {
+            "model": self.model,
+            "messages": [
+                {"role": "user", "content": prompt}
+            ]
+        }
+
+        response = requests.post(self.url, headers=headers, json=data)
+
+        if response.status_code == 200:
+            result = response.json()
+            return result["choices"][0]["message"]["content"].strip()
+        else:
+            raise RuntimeError(
+                f"API Error {response.status_code}: {response.text}"
+            )

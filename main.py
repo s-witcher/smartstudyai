@@ -1,8 +1,9 @@
 from ingestion.file_ingestion import ingest_file
-from providers.llm_provider import LLMProvider
 from algorithms.summarizer import generate_summary
 from algorithms.quiz_generator import generate_quiz
 from algorithms.flashcard_creator import generate_flashcards
+from providers import llm_providers
+# from providers.doai_provider import DOAIProvider as llm_providers
 
 def main():
     print("=== SmartStudyAI ===")
@@ -11,7 +12,7 @@ def main():
 
     print("\nProcessing file...")
     text = ingest_file(file_path)
-    llm = LLMProvider()
+    llm = llm_providers()
 
     if task == "summary":
         result = generate_summary(llm, text)
